@@ -1,0 +1,46 @@
+source: fbdat_2324_ is duckdb.table("../../data/fbdat_2324.parquet")
+
+source: ligue1_2324 is duckdb.table("../../data/fbdat/2324/fr.1.parquet") extend {
+    dimension:
+        HG is substr(FT, 0, 2)::number
+        AG is substr(FT, 3, 3)::number
+        H_pts is 
+            pick 3 when HG > AG
+            pick 1 when HG = AG
+            else 0
+        A_pts is H_pts ? 
+            pick 3 when 0
+            pick 1 when 1
+            else 0
+
+    measure:
+        H_pts_total is sum(H_pts)
+        A_pts_total is sum(A_pts)
+    
+    rename:
+        H_Team is `Team 1`
+        A_Team is `Team 2`
+
+    view: H_rank is { 
+        group_by: Team is H_Team
+        aggregate: Points is H_pts_total
+    }
+    view: A_rank is {
+        group_by: Team is A_Team
+        aggregate: Points is A_pts_total
+    }
+    
+}
+
+run: duckdb.sql("""
+  SELECT 
+    H.Team, 
+    H.Points as H_Points,
+    A.Points as A_Points,
+    H.Points + A.Points AS Total_Points,
+  FROM
+  (%{ ligue1_2324 -> H_rank }) H
+  INNER JOIN %{ ligue1_2324 -> A_rank } A
+  ON A.Team = H.Team
+  ORDER BY Total_Points DESC
+""")
