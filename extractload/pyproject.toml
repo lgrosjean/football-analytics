@@ -1,0 +1,9 @@
+[project]
+name = "extractload"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10.2, <3.12"
+dependencies = [
+    "ibis-framework[duckdb]>=9.5.0",
+]
