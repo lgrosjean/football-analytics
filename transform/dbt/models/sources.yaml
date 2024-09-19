@@ -1,0 +1,13 @@
+sources:
+  - name: football_data
+    tables:
+      - name: "2425"
+        config:
+          external_location: read_parquet('../../data/football-data/2425/*.parquet', filename = false, union_by_name = true)
+
+  - name: fbdat
+    tables:
+      - name: "2324"
+        config:
+          external_location: read_parquet('../../data/fbdat/2324/*.parquet', filename = true, union_by_name = true)
+# external_location: read_parquet('../../data/football-data/{name}/*.parquet', filename = true, union_by_name = true)
